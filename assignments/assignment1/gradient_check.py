@@ -1,5 +1,4 @@
-import numpy as np
-
+# TODO: Implement check_gradient function in gradient_check.py
 
 def check_gradient(f, x, delta=1e-5, tol = 1e-4):
     '''
@@ -32,8 +31,13 @@ def check_gradient(f, x, delta=1e-5, tol = 1e-4):
     while not it.finished:
         ix = it.multi_index
         analytic_grad_at_ix = analytic_grad[ix]
-        numeric_grad_at_ix = 0
-
+        
+        x_plus_delta = x.copy()
+        x_minus_delta = x.copy()
+        x_plus_delta[ix] = x_plus_delta[ix] + delta
+        x_minus_delta[ix] = x_minus_delta[ix] - delta
+        numeric_grad_at_ix = (f(x_plus_delta)[0] - f(x_minus_delta)[0]) / (2 * delta)
+        
         # TODO compute value of numeric gradient of f to idx
         if not np.isclose(numeric_grad_at_ix, analytic_grad_at_ix, tol):
             print("Gradients are different at %s. Analytic: %2.5f, Numeric: %2.5f" % (ix, analytic_grad_at_ix, numeric_grad_at_ix))
@@ -43,7 +47,3 @@ def check_gradient(f, x, delta=1e-5, tol = 1e-4):
 
     print("Gradient check passed!")
     return True
-
-        
-
-        
