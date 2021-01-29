@@ -1,42 +1,7 @@
 import numpy as np
-
-
-def l2_regularization(W, reg_strength):
-    """
-    Computes L2 regularization loss on weights and its gradient
-
-    Arguments:
-      W, np array - weights
-      reg_strength - float value
-
-    Returns:
-      loss, single value - l2 regularization loss
-      gradient, np.array same shape as W - gradient of weight by l2 loss
-    """
-    # TODO: Copy from the previous assignment
-    raise Exception("Not implemented!")
-    return loss, grad
-
-
-def softmax_with_cross_entropy(preds, target_index):
-    """
-    Computes softmax and cross-entropy loss for model predictions,
-    including the gradient
-
-    Arguments:
-      predictions, np array, shape is either (N) or (batch_size, N) -
-        classifier output
-      target_index: np array of int, shape is (1) or (batch_size) -
-        index of the true class for given sample(s)
-
-    Returns:
-      loss, single value - cross-entropy loss
-      dprediction, np array same shape as predictions - gradient of predictions by loss value
-    """
-    # TODO: Copy from the previous assignment
-    raise Exception("Not implemented!")
-
-    return loss, d_preds
+import sys
+sys.path.append('..')
+from assignment1.linear_classifer import softmax_with_cross_entropy, softmax, l2_regularization
 
 
 class Param:
@@ -52,14 +17,21 @@ class Param:
 
 class ReLULayer:
     def __init__(self):
-        pass
+        self.X = None
 
     def forward(self, X):
         # TODO: Implement forward pass
         # Hint: you'll need to save some information about X
         # to use it later in the backward pass
-        raise Exception("Not implemented!")
-
+        self.X = np.copy(X)
+        output = self._reLU(self.X)
+        
+        return output
+    
+    def _reLU(self, x):
+        x[x < 0] = 0
+        return x
+    
     def backward(self, d_out):
         """
         Backward pass
@@ -74,8 +46,15 @@ class ReLULayer:
         """
         # TODO: Implement backward pass
         # Your final implementation shouldn't have any loops
-        raise Exception("Not implemented!")
+
+        d_result = d_out * self._grad_reLU(self.X)
+
         return d_result
+    
+    def _grad_reLU(self, x):
+        x[x > 0] = 1
+        x[x < 0] = 0
+        return x
 
     def params(self):
         # ReLU Doesn't have any parameters
@@ -91,7 +70,8 @@ class FullyConnectedLayer:
     def forward(self, X):
         # TODO: Implement forward pass
         # Your final implementation shouldn't have any loops
-        raise Exception("Not implemented!")
+        self.X = X
+        return self.X @ self.W.value + self.B.value
 
     def backward(self, d_out):
         """
@@ -114,10 +94,11 @@ class FullyConnectedLayer:
 
         # It should be pretty similar to linear classifier from
         # the previous assignment
-
-        raise Exception("Not implemented!")
-
-        return d_input
+        d_result = d_out @ self.W.value.T
+        self.W.grad = self.X.T @ d_out
+        self.B.grad = np.ones((self.B.value.shape[0], self.X.shape[0])) @ d_out
+        
+        return d_result
 
     def params(self):
         return {'W': self.W, 'B': self.B}

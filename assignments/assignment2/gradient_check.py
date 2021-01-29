@@ -1,8 +1,8 @@
 import numpy as np
 
 
-def check_gradient(f, x, delta=1e-5, tol=1e-4):
-    """
+def check_gradient(f, x, delta=1e-5, tol = 1e-4):
+    '''
     Checks the implementation of analytical gradient by comparing
     it to numerical gradient using two-point formula
 
@@ -14,7 +14,8 @@ def check_gradient(f, x, delta=1e-5, tol=1e-4):
 
     Return:
       bool indicating whether gradients match or not
-    """
+    '''
+    
     assert isinstance(x, np.ndarray)
     assert x.dtype == np.float
 
@@ -27,10 +28,12 @@ def check_gradient(f, x, delta=1e-5, tol=1e-4):
     while not it.finished:
         ix = it.multi_index
         analytic_grad_at_ix = analytic_grad[ix]
-        numeric_grad_at_ix = 0
-
-        # TODO Copy from previous assignment
-        raise Exception("Not implemented!")
+        
+        x_plus_delta = x.copy()
+        x_minus_delta = x.copy()
+        x_plus_delta[ix] = x_plus_delta[ix] + delta
+        x_minus_delta[ix] = x_minus_delta[ix] - delta
+        numeric_grad_at_ix = (f(x_plus_delta)[0] - f(x_minus_delta)[0]) / (2 * delta)
 
         if not np.isclose(numeric_grad_at_ix, analytic_grad_at_ix, tol):
             print("Gradients are different at %s. Analytic: %2.5f, Numeric: %2.5f" % (
@@ -56,6 +59,7 @@ def check_layer_gradient(layer, x, delta=1e-5, tol=1e-4):
     Returns:
       bool indicating whether gradients match or not
     """
+    np.random.seed(10)
     output = layer.forward(x)
     output_weight = np.random.randn(*output.shape)
 

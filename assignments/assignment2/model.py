@@ -1,8 +1,3 @@
-import numpy as np
-
-from layers import FullyConnectedLayer, ReLULayer, softmax_with_cross_entropy, l2_regularization
-
-
 class TwoLayerNet:
     """ Neural network with two fully connected layers """
 
@@ -18,7 +13,9 @@ class TwoLayerNet:
         """
         self.reg = reg
         # TODO Create necessary layers
-        raise Exception("Not implemented!")
+        self.fc1 = FullyConnectedLayer(n_input, hidden_layer_size)
+        self.relu1 = ReLULayer()
+        self.fc2 = FullyConnectedLayer(hidden_layer_size, n_output)
 
     def compute_loss_and_gradients(self, X, y):
         """
@@ -33,17 +30,46 @@ class TwoLayerNet:
         # clear parameter gradients aggregated from the previous pass
         # TODO Set parameter gradient to zeros
         # Hint: using self.params() might be useful!
-        raise Exception("Not implemented!")
+        self._zero_grad()
         
         # TODO Compute loss and fill param gradients
         # by running forward and backward passes through the model
+        predictions = self._forward(X)
+        loss, dprediction = softmax_with_cross_entropy(predictions, y)
+        self._backward(dprediction)
         
         # After that, implement l2 regularization on all params
         # Hint: self.params() is useful again!
-        raise Exception("Not implemented!")
-
+        loss_l2 = self._backward_l2_regularization()
+        loss += loss_l2
+        
         return loss
 
+    def _zero_grad(self):
+        for param in self.params().values():
+            param.grad = np.zeros_like(param.value)
+                
+    def _forward(self, X):
+        output = self.fc1.forward(X)
+        output = self.relu1.forward(output)
+        output = self.fc2.forward(output)
+        return output
+    
+    def _backward(self, dprediction):
+        grad = self.fc2.backward(dprediction)
+        grad = self.relu1.backward(grad)
+        self.fc1.backward(grad)
+        
+    def _backward_l2_regularization(self):
+        loss_l2 = 0.
+        
+        for param in self.params().values():
+            param_loss_l2, param_grad_l2 = l2_regularization(param.value, self.reg)
+            param.grad += param_grad_l2
+            loss_l2 += param_loss_l2
+                
+        return loss_l2
+    
     def predict(self, X):
         """
         Produces classifier predictions on the set
@@ -59,14 +85,21 @@ class TwoLayerNet:
         # can be reused
         pred = np.zeros(X.shape[0], np.int)
 
-        raise Exception("Not implemented!")
-        return pred
+        predictions = self._forward(X)
+        y_pred = np.argmax(softmax(predictions), axis=1)
+
+        return y_pred
 
     def params(self):
         result = {}
 
         # TODO Implement aggregating all of the params
+        for k, v in self.fc2.params().items():
+            result["".join(["fc2_", k])] = v
+        
+        for k, v in self.fc1.params().items():
+            result["".join(["fc1_", k])] = v
+            
 
-        raise Exception("Not implemented!")
-
+        
         return result
