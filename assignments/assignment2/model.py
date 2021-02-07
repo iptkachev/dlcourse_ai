@@ -83,8 +83,6 @@ class TwoLayerNet:
         # TODO: Implement predict
         # Hint: some of the code of the compute_loss_and_gradients
         # can be reused
-        pred = np.zeros(X.shape[0], np.int)
-
         predictions = self._forward(X)
         y_pred = np.argmax(softmax(predictions), axis=1)
 

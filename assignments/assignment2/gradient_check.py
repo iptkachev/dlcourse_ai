@@ -33,7 +33,7 @@ def check_gradient(f, x, delta=1e-5, tol = 1e-4):
         x_minus_delta = x.copy()
         x_plus_delta[ix] = x_plus_delta[ix] + delta
         x_minus_delta[ix] = x_minus_delta[ix] - delta
-        numeric_grad_at_ix = (f(x_plus_delta)[0] - f(x_minus_delta)[0]) / (2 * delta)
+        numeric_grad_at_ix = np.divide((f(x_plus_delta)[0] - f(x_minus_delta)[0]), (2 * delta))
 
         if not np.isclose(numeric_grad_at_ix, analytic_grad_at_ix, tol):
             print("Gradients are different at %s. Analytic: %2.5f, Numeric: %2.5f" % (
@@ -46,7 +46,7 @@ def check_gradient(f, x, delta=1e-5, tol = 1e-4):
     return True
 
 
-def check_layer_gradient(layer, x, delta=1e-5, tol=1e-4):
+def check_layer_gradient(layer, x, delta=1e-5, tol=1e-4, seed=None):
     """
     Checks gradient correctness for the input and output of a layer
 
@@ -59,7 +59,7 @@ def check_layer_gradient(layer, x, delta=1e-5, tol=1e-4):
     Returns:
       bool indicating whether gradients match or not
     """
-    np.random.seed(10)
+    np.random.seed(seed)
     output = layer.forward(x)
     output_weight = np.random.randn(*output.shape)
 
@@ -75,7 +75,7 @@ def check_layer_gradient(layer, x, delta=1e-5, tol=1e-4):
 
 def check_layer_param_gradient(layer, x,
                                param_name,
-                               delta=1e-5, tol=1e-4):
+                               delta=1e-5, tol=1e-4, seed=None):
     """
     Checks gradient correctness for the parameter of the layer
 
@@ -91,7 +91,8 @@ def check_layer_param_gradient(layer, x,
     """
     param = layer.params()[param_name]
     initial_w = param.value
-
+    
+    np.random.seed(seed)
     output = layer.forward(x)
     output_weight = np.random.randn(*output.shape)
 

@@ -96,7 +96,7 @@ class FullyConnectedLayer:
         # the previous assignment
         d_result = d_out @ self.W.value.T
         self.W.grad = self.X.T @ d_out
-        self.B.grad = np.ones((self.B.value.shape[0], self.X.shape[0])) @ d_out
+        self.B.grad = d_out.sum(axis=0, keepdims=True)
         
         return d_result
 
