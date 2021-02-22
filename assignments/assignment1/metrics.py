@@ -26,7 +26,7 @@ def binary_classification_metrics(prediction, ground_truth):
             tp += (prediction[i] == ground_truth[i])
             
     recall = tp / ground_truth.sum()
-    precision = tp / count_objects
+    precision = tp / prediction.sum()
     f1 = 2 * precision * recall / (precision + recall)
     
     accuracy = (prediction == ground_truth).sum() / count_objects
